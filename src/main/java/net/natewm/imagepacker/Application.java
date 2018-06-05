@@ -186,25 +186,25 @@ public class Application implements AppListenable, ImageListener, OptionListener
             // TODO: Add image filename.
             writer.println("    \"image\": \"" + outputOptions.getOutputName() + "\",");
             writer.println("    \"type\": \"map\",");
-            writer.println("    \"regions\": {");
+            writer.println("    \"regions\": [");
 
             for (int i=0; i<outputResults.packed.size(); i++) {
                 Rectangle<PackableImage> rectangle = outputResults.packed.get(i);
-                writer.println("        [");
+                writer.println("        {");
                 writer.println("            \"id\": \"" + rectangle.getContent().getName() + "\",");
                 writer.println("            \"x\": " + (rectangle.getX() + outputOptions.getPadding()) + ",");
                 writer.println("            \"y\": " + (rectangle.getY() + outputOptions.getPadding()) + ",");
                 writer.println("            \"width\": " + (rectangle.getWidth() - outputOptions.getPadding() * 2) + ",");
                 writer.println("            \"height\": " + (rectangle.getHeight() - outputOptions.getPadding() * 2) + ",");
-                writer.println("            \"offsetX\": 0,");  // TODO: Image offset (from trimming images)
-                writer.println("            \"offsetY\": 0");
+                writer.println("            \"offsetX\": " + rectangle.getContent().getMinX() + ", ");
+                writer.println("            \"offsetY\": " + rectangle.getContent().getMinY());
                 if (i < outputResults.packed.size()-1)
-                    writer.println("        ],");
+                    writer.println("        },");
                 else
-                    writer.println("        ]");
+                    writer.println("        }");
             }
 
-            writer.println("    }");
+            writer.println("    ]");
             writer.println("}");
 
             writer.close();
