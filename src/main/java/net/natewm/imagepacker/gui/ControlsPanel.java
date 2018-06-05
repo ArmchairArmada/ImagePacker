@@ -27,7 +27,6 @@ public class ControlsPanel extends JPanel {
 
     public ControlsPanel(Options options, ImageManager imageManager) {
         // TODO: Add "remove file extension" option.
-        // TODO: Add packed image name field.
 
         this.options = options;
         this.imageManager = imageManager;
@@ -36,7 +35,6 @@ public class ControlsPanel extends JPanel {
 
         setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-        // TODO: Change to using GridBagLayout
         GridBagLayout layout = new GridBagLayout();
         setLayout(layout);
         GridBagConstraints constraints = new GridBagConstraints();

@@ -45,7 +45,6 @@ public class Application implements AppListenable, ImageListener, OptionListener
 
     @Override
     public void onLoadImages(List<File> files) {
-        // TODO: Job queue with worker threads for loading images.
         ImageIO.setUseCache(false);
 
         files.forEach(file -> {
@@ -71,7 +70,6 @@ public class Application implements AppListenable, ImageListener, OptionListener
 
     @Override
     public void onRemoveImage(PackableImage image) {
-        // TODO: Need to keep a list of images if I am doing live updating.
         doLiveUpdate();
     }
 
@@ -164,7 +162,6 @@ public class Application implements AppListenable, ImageListener, OptionListener
     private synchronized void packCompleted(Image outputImage, RectanglePacker.Results<PackableImage> results) {
         outputResults = results;
         imageManager.setOutputImage(outputImage);
-        // TODO: Store results somewhere.
         for (int i=listeners.size()-1; i>=0; i--)
             listeners.get(i).onPackCompleted(outputImage, results);
     }
@@ -183,7 +180,6 @@ public class Application implements AppListenable, ImageListener, OptionListener
         try {
             PrintWriter writer = new PrintWriter(file);
             writer.println("{");
-            // TODO: Add image filename.
             writer.println("    \"image\": \"" + outputOptions.getOutputName() + "\",");
             writer.println("    \"type\": \"map\",");
             writer.println("    \"regions\": [");
@@ -215,15 +211,11 @@ public class Application implements AppListenable, ImageListener, OptionListener
 
     @Override
     public void onTrimImagesChange(boolean value) {
-        // TODO: if value==true, trim images edges.
-        // TODO: if live update, repack
         doLiveUpdate();
     }
 
     @Override
     public void onExtendEdgesChange(boolean value) {
-        // TODO: if value==true, extend edges.
-        // TODO: if live update, repack
         doLiveUpdate();
     }
 
@@ -238,13 +230,11 @@ public class Application implements AppListenable, ImageListener, OptionListener
 
     @Override
     public void onOutputSizeChange(int width, int height) {
-        // TODO: If live update, repack.
         doLiveUpdate();
     }
 
     @Override
     public void onPaddingChange(int value) {
-        // TODO: If live update, repack.
         doLiveUpdate();
     }
 

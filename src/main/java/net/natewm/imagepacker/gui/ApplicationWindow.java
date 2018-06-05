@@ -124,7 +124,6 @@ public class ApplicationWindow extends JFrame implements
         add(imagePreview, constraints);
         imageManager.addImageListener(imagePreview);
 
-        // TODO: Fill out more status information
         StatusBar statusBar = new StatusBar(application);
         constraints.gridx = 0;
         constraints.gridy = 2;
