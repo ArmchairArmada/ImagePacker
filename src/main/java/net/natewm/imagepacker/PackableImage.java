@@ -51,7 +51,7 @@ public class PackableImage {
     }
 
     public void makeModifiedImage() {
-        // TODO: Generate trimmed image
+        // TODO: Generate extended images?
     }
 
     public void calculateTrim() {
