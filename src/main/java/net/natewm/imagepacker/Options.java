@@ -9,11 +9,22 @@ public class Options implements OptionListenable {
     private boolean trimImages = false;
     private boolean extendEdges = false;
     private boolean liveUpdate = false;
+    private String outputName = "";
     private int outputWidth = 512;
     private int outputHeight = 512;
     private int padding = 0;
 
     public Options() {
+    }
+
+    public Options(Options other) {
+        trimImages = other.trimImages;
+        extendEdges = other.extendEdges;
+        liveUpdate = other.liveUpdate;
+        outputName = other.outputName;
+        outputWidth = other.outputWidth;
+        outputHeight = other.outputHeight;
+        padding = other.padding;
     }
 
     public boolean getTrimImages() {
@@ -44,6 +55,16 @@ public class Options implements OptionListenable {
         liveUpdate = value;
         for (int i=listeners.size()-1; i>=0; i--)
             listeners.get(i).onLiveUpdateChange(liveUpdate);
+    }
+
+    public String getOutputName() {
+        return outputName;
+    }
+
+    public synchronized void setOutputName(String value) {
+        outputName = value;
+        for (int i=listeners.size()-1; i>=0; i--)
+            listeners.get(i).onOutputNameChange(outputName);
     }
 
     public int getOutputWidth() {

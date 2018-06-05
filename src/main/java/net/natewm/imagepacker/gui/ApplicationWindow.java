@@ -22,9 +22,10 @@ public class ApplicationWindow extends JFrame implements
 
     private final JFileChooser fileChooser = new JFileChooser();
     private final JFileChooser fileSaveChooser = new JFileChooser();
+    private final JFileChooser fileJsonSaveChooser = new JFileChooser();
     private Icon errorIcon = UIManager.getIcon("OptionPane.errorIcon");
 
-    public ApplicationWindow(Options options, ImageManager imageManager, AppListenable application) {
+    public ApplicationWindow(Options options, ImageManager imageManager, Application application) {
         setTitle("Image Packer");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -32,6 +33,7 @@ public class ApplicationWindow extends JFrame implements
         fileChooser.setMultiSelectionEnabled(true);
 
         fileSaveChooser.setFileFilter(new FileNameExtensionFilter("PNG", "png"));
+        fileJsonSaveChooser.setFileFilter(new FileNameExtensionFilter("JSON", "json"));
 
         GridBagConstraints constraints = new GridBagConstraints();
         GridBagLayout layout = new GridBagLayout();
@@ -52,6 +54,25 @@ public class ApplicationWindow extends JFrame implements
             }
         });
         fileMenu.add(savePackedImage);
+
+        final JMenuItem saveRectangles = new JMenuItem("Save Rectangles File");
+        saveRectangles.setMnemonic(KeyEvent.VK_S);
+        saveRectangles.addActionListener(e -> {
+            int retval = fileJsonSaveChooser.showSaveDialog(this);
+            if (retval == JFileChooser.APPROVE_OPTION) {
+                application.saveRectangles(fileJsonSaveChooser.getSelectedFile());
+            }
+        });
+        fileMenu.add(saveRectangles);
+
+        fileMenu.addSeparator();
+
+        final JMenuItem exitMenu = new JMenuItem("Exit");
+        exitMenu.setMnemonic(KeyEvent.VK_X);
+        exitMenu.addActionListener(e -> {
+            System.exit(0);
+        });
+        fileMenu.add(exitMenu);
 
         final JMenu imageMenu = new JMenu("Images");
         imageMenu.setMnemonic(KeyEvent.VK_I);

@@ -7,6 +7,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.logging.Logger;
 
 public class ControlsPanel extends JPanel {
@@ -24,6 +26,9 @@ public class ControlsPanel extends JPanel {
     private final JSpinner paddingSpinner;
 
     public ControlsPanel(Options options, ImageManager imageManager) {
+        // TODO: Add "remove file extension" option.
+        // TODO: Add packed image name field.
+
         this.options = options;
         this.imageManager = imageManager;
 
@@ -58,7 +63,7 @@ public class ControlsPanel extends JPanel {
         });
         extendEdges.setAlignmentX(Component.LEFT_ALIGNMENT);
         constraints.gridx = 0;
-        constraints.gridy = 1;
+        constraints.gridy++;
         constraints.gridwidth = 2;
         constraints.gridheight = 1;
         constraints.fill = GridBagConstraints.BOTH;
@@ -72,15 +77,48 @@ public class ControlsPanel extends JPanel {
         });
         liveUpdate.setAlignmentX(Component.LEFT_ALIGNMENT);
         constraints.gridx = 0;
-        constraints.gridy = 2;
+        constraints.gridy++;
         constraints.gridwidth = 2;
         constraints.gridheight = 1;
         constraints.fill = GridBagConstraints.BOTH;
         add(liveUpdate, constraints);
 
+        tmpLabel = new JLabel("Output Name: ");
+        constraints.gridx = 0;
+        constraints.gridy++;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.insets = new Insets(5,5,5,5);
+        add(tmpLabel, constraints);
+
+        JTextField outputName = new JTextField();
+        outputName.setToolTipText("Name of output image in JSON file.");
+        outputName.addActionListener(e -> {
+            options.setOutputName(outputName.getText());
+        });
+
+        outputName.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                options.setOutputName(outputName.getText());
+            }
+        });
+
+        constraints.gridx = 1;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        constraints.fill = GridBagConstraints.BOTH;
+        add(outputName, constraints);
+
         tmpLabel = new JLabel("Output Width: ");
         constraints.gridx = 0;
-        constraints.gridy = 3;
+        constraints.gridy++;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
         constraints.fill = GridBagConstraints.BOTH;
@@ -92,7 +130,6 @@ public class ControlsPanel extends JPanel {
         widthSpinner.setToolTipText("Width of packing area.");
 
         constraints.gridx = 1;
-        constraints.gridy = 3;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
         constraints.fill = GridBagConstraints.BOTH;
@@ -100,7 +137,7 @@ public class ControlsPanel extends JPanel {
 
         tmpLabel = new JLabel("Output Height: ");
         constraints.gridx = 0;
-        constraints.gridy = 4;
+        constraints.gridy++;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
         constraints.fill = GridBagConstraints.BOTH;
@@ -110,7 +147,6 @@ public class ControlsPanel extends JPanel {
         heightSpinner.setModel(new SpinnerNumberModel(512, 0, 65536, 1));
         heightSpinner.setToolTipText("Height of packing area.");
         constraints.gridx = 1;
-        constraints.gridy = 4;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
         constraints.fill = GridBagConstraints.BOTH;
@@ -126,7 +162,7 @@ public class ControlsPanel extends JPanel {
 
         tmpLabel = new JLabel("Padding: ");
         constraints.gridx = 0;
-        constraints.gridy = 5;
+        constraints.gridy++;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
         constraints.fill = GridBagConstraints.BOTH;
@@ -139,7 +175,6 @@ public class ControlsPanel extends JPanel {
             options.setPadding((Integer)paddingSpinner.getValue());
         });
         constraints.gridx = 1;
-        constraints.gridy = 5;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
         constraints.fill = GridBagConstraints.BOTH;
@@ -150,7 +185,7 @@ public class ControlsPanel extends JPanel {
             imageManager.packImages();
         });
         constraints.gridx = 0;
-        constraints.gridy = 6;
+        constraints.gridy++;
         constraints.gridwidth = 2;
         constraints.gridheight = 1;
         constraints.fill = GridBagConstraints.BOTH;
