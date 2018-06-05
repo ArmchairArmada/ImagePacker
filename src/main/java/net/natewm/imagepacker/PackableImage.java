@@ -102,4 +102,3 @@ public class PackableImage {
         return maxY - minY;
     }
 }
-
