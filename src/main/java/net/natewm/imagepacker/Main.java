@@ -4,6 +4,7 @@ import net.natewm.imagepacker.gui.ApplicationWindow;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 public class Main {
@@ -25,6 +26,7 @@ public class Main {
                 e.printStackTrace();
             }
 
+            Services.setExecutorService(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()));
             Options options = new Options();
             ImageManager imageManager = new ImageManager();
             Application app = new Application(options, imageManager);

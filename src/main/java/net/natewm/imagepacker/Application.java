@@ -8,13 +8,10 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -24,7 +21,6 @@ public class Application implements AppListenable, ImageListener, OptionListener
     private List<AppListener> listeners = new ArrayList<>();
     private List<ErrorListener> errorListeners = new ArrayList<>();
 
-    private ExecutorService executorService;
     private Options options;
     private ImageManager imageManager;
 
@@ -34,7 +30,6 @@ public class Application implements AppListenable, ImageListener, OptionListener
     public Application(Options options, ImageManager imageManager) {
         this.options = options;
         this.imageManager = imageManager;
-        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         logger.info("Using " + Runtime.getRuntime().availableProcessors() + " threads.");
     }
 
@@ -54,7 +49,7 @@ public class Application implements AppListenable, ImageListener, OptionListener
         ImageIO.setUseCache(false);
 
         files.forEach(file -> {
-            executorService.submit(() -> {
+            Services.getExecutorService().submit(() -> {
                 try {
                     final Image image = ImageIO.read(file);
                     if (image == null) throw new IOException();
@@ -89,15 +84,27 @@ public class Application implements AppListenable, ImageListener, OptionListener
     public synchronized void onPackImages(List<PackableImage> images) {
         outputOptions = new Options(options);
 
-        executorService.submit(() -> {
+        Services.getExecutorService().submit(() -> {
             RectanglePacker<PackableImage> packer = new BinarySubdividePacker<>();
-            List<net.natewm.imagepacker.rectpacker.Rectangle<PackableImage>> rectangles = images.stream().map(i ->
-                    new net.natewm.imagepacker.rectpacker.Rectangle<>(
-                            i.getImage().getWidth(null) + outputOptions.getPadding()*2,
-                            i.getImage().getHeight(null) + outputOptions.getPadding()*2,
-                            i
-                    )
-            ).collect(Collectors.toList());
+            List<net.natewm.imagepacker.rectpacker.Rectangle<PackableImage>> rectangles;
+            if (outputOptions.getTrimImages()) {
+                rectangles = images.stream().map(i ->
+                        new net.natewm.imagepacker.rectpacker.Rectangle<>(
+                                i.trimmedWidth() + outputOptions.getPadding() * 2,
+                                i.trimmedHeight() + outputOptions.getPadding() * 2,
+                                i
+                        )
+                ).collect(Collectors.toList());
+            }
+            else {
+                rectangles = images.stream().map(i ->
+                        new net.natewm.imagepacker.rectpacker.Rectangle<>(
+                                i.getImage().getWidth(null) + outputOptions.getPadding() * 2,
+                                i.getImage().getHeight(null) + outputOptions.getPadding() * 2,
+                                i
+                        )
+                ).collect(Collectors.toList());
+            }
             RectanglePacker.Results<PackableImage> results = packer.pack(
                     rectangles,
                     outputOptions.getOutputWidth(),
@@ -108,14 +115,33 @@ public class Application implements AppListenable, ImageListener, OptionListener
                     outputOptions.getOutputHeight(),
                     BufferedImage.TYPE_4BYTE_ABGR);
 
-            for (Rectangle<PackableImage> rect : results.packed) {
-                // TODO: Outline option
-                // outputImage.getGraphics().drawRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
-                outputImage.getGraphics().drawImage(
-                        rect.getContent().getImage(),
-                        rect.getX() + outputOptions.getPadding(),
-                        rect.getY() + outputOptions.getPadding(),
-                        null);
+            if (outputOptions.getTrimImages()) {
+                for (Rectangle<PackableImage> rect : results.packed) {
+                    // TODO: Outline option
+                    // outputImage.getGraphics().drawRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+                    outputImage.getGraphics().drawImage(
+                            rect.getContent().getImage(),
+                            rect.getX() + outputOptions.getPadding(),
+                            rect.getY() + outputOptions.getPadding(),
+                            rect.getX() + outputOptions.getPadding() + rect.getContent().trimmedWidth(),
+                            rect.getY() + outputOptions.getPadding() + rect.getContent().trimmedHeight(),
+                            rect.getContent().getMinX(),
+                            rect.getContent().getMinY(),
+                            rect.getContent().getMaxX(),
+                            rect.getContent().getMaxY(),
+                            null);
+                }
+            }
+            else {
+                for (Rectangle<PackableImage> rect : results.packed) {
+                    // TODO: Outline option
+                    // outputImage.getGraphics().drawRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+                    outputImage.getGraphics().drawImage(
+                            rect.getContent().getImage(),
+                            rect.getX() + outputOptions.getPadding(),
+                            rect.getY() + outputOptions.getPadding(),
+                            null);
+                }
             }
 
             packCompleted(outputImage, results);
