@@ -28,7 +28,7 @@ public class BinarySubdividePacker<T> implements RectanglePacker<T> {
             return dh;
         });
 
-        Rectangle space = new Rectangle(width, height);
+        Rectangle space = new Rectangle(0, 0, width, height);
 
         int waste = recursivePack(rectsW, rectsH, space, results);
 
