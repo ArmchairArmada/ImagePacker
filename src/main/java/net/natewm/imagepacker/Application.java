@@ -78,6 +78,7 @@ public class Application implements AppListenable, ImageListener, OptionListener
         // TODO: Figure out what to do about this.
     }
 
+    // TODO: Move this into ImageManager and remove onPackImages from ImageListener?
     @Override
     public synchronized void onPackImages(List<PackableImage> images) {
         outputOptions = new Options(options);

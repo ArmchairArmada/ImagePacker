@@ -12,9 +12,15 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+/**
+ * The main application window.
+ */
 public class ApplicationWindow extends JFrame implements
         AppListener, ErrorListener {
     private final Logger logger = Logger.getLogger(ApplicationWindow.class.getName());
+
+    private final ImageManager imageManager;
+    private final Application application;
 
     private final ControlsPanel controlsPanel;
     private final ImageListPanel imageListPanel;
@@ -25,7 +31,17 @@ public class ApplicationWindow extends JFrame implements
     private final JFileChooser fileJsonSaveChooser = new JFileChooser();
     private Icon errorIcon = UIManager.getIcon("OptionPane.errorIcon");
 
+    /**
+     * Constructs the application window.
+     *
+     * @param options      Options object used for keeping track of application settings.
+     * @param imageManager Manages images used by the application.
+     * @param application  The application performs core functions.
+     */
     public ApplicationWindow(Options options, ImageManager imageManager, Application application) {
+        this.imageManager = imageManager;
+        this.application = application;
+
         setTitle("Image Packer");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -39,7 +55,57 @@ public class ApplicationWindow extends JFrame implements
         GridBagLayout layout = new GridBagLayout();
         setLayout(layout);
 
-        // Menu Bar
+        imageListPanel = new ImageListPanel(imageManager);
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        constraints.weightx = 0;
+        constraints.weighty = 1;
+        constraints.fill = GridBagConstraints.BOTH;
+        add(imageListPanel, constraints);
+
+        controlsPanel = new ControlsPanel(options, imageManager);
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 1;
+        constraints.weightx = 0;
+        constraints.weighty = 0;
+        constraints.fill = GridBagConstraints.BOTH;
+        add(controlsPanel, constraints);
+
+        imagePreview = new ImagePreview();
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 2;
+        constraints.weightx = 1;
+        constraints.weighty = 1;
+        constraints.fill = GridBagConstraints.BOTH;
+        add(imagePreview, constraints);
+        imageManager.addImageListener(imagePreview);
+
+        StatusBar statusBar = new StatusBar(application);
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.gridwidth = 2;
+        constraints.gridheight = 1;
+        constraints.weightx = 1;
+        constraints.weighty = 0;
+        constraints.fill = GridBagConstraints.BOTH;
+        add(statusBar, constraints);
+
+        initMenu();
+
+        pack();
+        setLocationRelativeTo(null);
+    }
+
+    /**
+     * Initializes the window's menu bar.
+     */
+    private void initMenu() {
         final JMenuBar menuBar = new JMenuBar();
         final JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
@@ -82,6 +148,13 @@ public class ApplicationWindow extends JFrame implements
         loadImagesMenu.setMnemonic(KeyEvent.VK_L);
         imageMenu.add(loadImagesMenu);
 
+        loadImagesMenu.addActionListener(listener -> {
+            int retval = fileChooser.showOpenDialog(this);
+            if (retval == JFileChooser.APPROVE_OPTION) {
+                imageManager.loadImages(Arrays.asList(fileChooser.getSelectedFiles()));
+            }
+        });
+
         final JMenu packMenu = new JMenu("Pack");
         packMenu.setMnemonic(KeyEvent.VK_P);
         menuBar.add(packMenu);
@@ -90,65 +163,18 @@ public class ApplicationWindow extends JFrame implements
         doPackMenu.setMnemonic(KeyEvent.VK_I);
         packMenu.add(doPackMenu);
 
-        setJMenuBar(menuBar);
-
-        imageListPanel = new ImageListPanel(imageManager);
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.weightx = 0;
-        constraints.weighty = 1;
-        constraints.fill = GridBagConstraints.BOTH;
-        add(imageListPanel, constraints);
-
-        // Panels
-        controlsPanel = new ControlsPanel(options, imageManager);
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.weightx = 0;
-        constraints.weighty = 0;
-        constraints.fill = GridBagConstraints.BOTH;
-        add(controlsPanel, constraints);
-
-        imagePreview = new ImagePreview();
-        constraints.gridx = 1;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 2;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.fill = GridBagConstraints.BOTH;
-        add(imagePreview, constraints);
-        imageManager.addImageListener(imagePreview);
-
-        StatusBar statusBar = new StatusBar(application);
-        constraints.gridx = 0;
-        constraints.gridy = 2;
-        constraints.gridwidth = 2;
-        constraints.gridheight = 1;
-        constraints.weightx = 1;
-        constraints.weighty = 0;
-        constraints.fill = GridBagConstraints.BOTH;
-        add(statusBar, constraints);
-
-        loadImagesMenu.addActionListener(listener -> {
-            int retval = fileChooser.showOpenDialog(this);
-            if (retval == JFileChooser.APPROVE_OPTION) {
-                imageListPanel.loadImages(Arrays.asList(fileChooser.getSelectedFiles()));
-            }
-        });
-
         doPackMenu.addActionListener(listener -> {
             imageManager.packImages();
         });
 
-        pack();
-        setLocationRelativeTo(null);
+        setJMenuBar(menuBar);
     }
 
+    /**
+     * Called when an image is loaded.
+     *
+     * @param image Image that was just loaded.
+     */
     @Override
     public void onImageLoaded(PackableImage image) {
         SwingUtilities.invokeLater(() -> {
@@ -156,10 +182,21 @@ public class ApplicationWindow extends JFrame implements
         });
     }
 
+    /**
+     * Called when image packing has completed.
+     *
+     * @param packedImage Image produced by packing images.
+     * @param results     The resulting rectangle packing.
+     */
     @Override
     public void onPackCompleted(Image packedImage, RectanglePacker.Results<PackableImage> results) {
     }
 
+    /**
+     * Called when there is an error loading an image file.
+     *
+     * @param file File that failed to load.
+     */
     @Override
     public void onErrorLoadingImage(File file) {
         SwingUtilities.invokeLater(() -> {

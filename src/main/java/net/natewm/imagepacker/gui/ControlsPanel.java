@@ -11,6 +11,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.logging.Logger;
 
+/**
+ * Control panel, which is embedded in the main window.
+ */
 public class ControlsPanel extends JPanel {
     private static Logger logger = Logger.getLogger(ControlsPanel.class.getName());
 
@@ -18,13 +21,19 @@ public class ControlsPanel extends JPanel {
     private final ImageManager imageManager;
 
     private final JCheckBox trimImages;
-    private final JCheckBox extendEdges;
+    //private final JCheckBox extendEdges;
     private final JCheckBox liveUpdate;
 
     private final JSpinner widthSpinner;
     private final JSpinner heightSpinner;
     private final JSpinner paddingSpinner;
 
+    /**
+     * Constructs the control panel.
+     *
+     * @param options      Options, which will be modified by the control panel.
+     * @param imageManager Manages the images used by the application.
+     */
     public ControlsPanel(Options options, ImageManager imageManager) {
         // TODO: Add "remove file extension" option.
 
@@ -53,6 +62,7 @@ public class ControlsPanel extends JPanel {
         constraints.fill = GridBagConstraints.BOTH;
         add(trimImages, constraints);
 
+        /*
         extendEdges = new JCheckBox("Extend Edges");
         extendEdges.setToolTipText("Extends the edge pixels into the padding.");
         extendEdges.addActionListener((ActionEvent e) -> {
@@ -66,6 +76,7 @@ public class ControlsPanel extends JPanel {
         constraints.gridheight = 1;
         constraints.fill = GridBagConstraints.BOTH;
         add(extendEdges, constraints);
+        */
 
         liveUpdate = new JCheckBox("Live Update");
         liveUpdate.setToolTipText("Updates image packing as soon as a change is made.");
@@ -99,7 +110,6 @@ public class ControlsPanel extends JPanel {
         outputName.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
-
             }
 
             @Override

@@ -6,6 +6,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
+/**
+ * An individual image, which had been loaded.
+ */
 public class ImageItemPanel extends JPanel {
     private final ImageListPanel imageListPanel;
     private final PackableImage image;
@@ -13,6 +16,12 @@ public class ImageItemPanel extends JPanel {
     private static JLabel imageLabel;
     private static JButton removeButton;
 
+    /**
+     * Constructs image item panel.
+     *
+     * @param imageListPanel The panel used for listing image items.
+     * @param image          Image that this panel will represent.
+     */
     public ImageItemPanel(ImageListPanel imageListPanel, PackableImage image) {
         this.imageListPanel = imageListPanel;
         this.image = image;
@@ -23,15 +32,8 @@ public class ImageItemPanel extends JPanel {
 
         setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
         setBackground(Color.WHITE);
-        /*
-        if (Math.random() < 0.2)
-            setBackground(Color.RED);
-        else
-            setBackground(Color.WHITE);
-        */
 
         JLabel thumbnail = new JLabel(new ImageIcon(image.getThumbnail()));
-        //thumbnail.setBackground(new Color((float)Math.random(), (float)Math.random(), (float)Math.random()));
         thumbnail.setPreferredSize(new Dimension(32, 32));
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -72,6 +74,11 @@ public class ImageItemPanel extends JPanel {
         setMaximumSize(new Dimension(100000, getPreferredSize().height));
     }
 
+    /**
+     * Gets the image this panel is representing.
+     *
+     * @return Image.
+     */
     public PackableImage getImage() {
         return image;
     }
