@@ -11,11 +11,19 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Lists panels of images that have been loaded into the application.
+ */
 public class ImageListPanel extends JPanel implements ImageListener {
     private final ImageManager imageManager;
     private final JPanel listPanel;
     private final JScrollPane scrollPane;
 
+    /**
+     * Constructs the panel for listing images.
+     *
+     * @param imageManager Manages the images used by the application.
+     */
     public ImageListPanel(ImageManager imageManager) {
         this.imageManager = imageManager;
         setLayout(new BorderLayout());
@@ -35,49 +43,54 @@ public class ImageListPanel extends JPanel implements ImageListener {
         add(scrollPane, BorderLayout.CENTER);
     }
 
+    /**
+     * When an image is added, an image item panel will be created and added for it.
+     *
+     * @param image Image to add to the list.
+     */
     public void addImage(PackableImage image) {
         addImageItem(new ImageItemPanel(this, image));
     }
 
-    public void loadImages(List<File> files) {
-        imageManager.loadImages(files);
-    }
-
-    public void addImageItem(ImageItemPanel imageItemPanel) {
+    /**
+     * Adds an image item to the image list panel.
+     *
+     * @param imageItemPanel Image item to add.
+     */
+    private void addImageItem(ImageItemPanel imageItemPanel) {
         listPanel.add(imageItemPanel);
         scrollPane.setMinimumSize(scrollPane.getPreferredSize());
         revalidate();
         repaint();
     }
 
+    /**
+     * Removes an image item panel from this list panel.
+     *
+     * @param imageItemPanel Image item panel to remove.
+     */
     public void removeImageItem(ImageItemPanel imageItemPanel) {
         listPanel.remove(imageItemPanel);
         scrollPane.setMinimumSize(scrollPane.getPreferredSize());
         revalidate();
         repaint();
-        imageRemove(imageItemPanel.getImage());
+        imageManager.removeImage(imageItemPanel.getImage());
     }
 
-    public void packImages() {
-        List<PackableImage> images = new ArrayList<>();
-        for (Component component : listPanel.getComponents()) {
-            images.add(((ImageItemPanel)component).getImage());
-        }
-        packImages(images);
-    }
-
-    private void imageRemove(PackableImage image) {
-        imageManager.removeImage(image);
-    }
-
-    private void packImages(List<PackableImage> images) {
-        imageManager.packImages();
-    }
-
+    /**
+     * Called when images are loaded.
+     *
+     * @param files List of images that have loaded.
+     */
     @Override
     public void onLoadImages(List<File> files) {
     }
 
+    /**
+     * Called when an image has been added to the application.
+     *
+     * @param image Image that has been added.
+     */
     @Override
     public void onAddImage(PackableImage image) {
         SwingUtilities.invokeLater(() -> {
@@ -85,6 +98,11 @@ public class ImageListPanel extends JPanel implements ImageListener {
         });
     }
 
+    /**
+     * Called when an image has been removed from the application.
+     *
+     * @param image Image that has been removed.
+     */
     @Override
     public void onRemoveImage(PackableImage image) {
         SwingUtilities.invokeLater(() -> {
@@ -99,15 +117,29 @@ public class ImageListPanel extends JPanel implements ImageListener {
         });
     }
 
+    /**
+     * Called when an image has been renamed.
+     *
+     * @param image Image that has been renamed.
+     */
     @Override
     public void onRenameImage(PackableImage image) {
-
     }
 
+    /**
+     * Called when images have been packed.
+     *
+     * @param images List of images that have been packed.
+     */
     @Override
     public void onPackImages(List<PackableImage> images) {
     }
 
+    /**
+     * Called when the output image has changed in the ImageManager.
+     *
+     * @param outputImage Image the output image has been changed to.
+     */
     @Override
     public void onSetOutputImage(Image outputImage) {
     }
