@@ -4,7 +4,6 @@ import net.natewm.imagepacker.rectpacker.BinarySubdividePacker;
 import net.natewm.imagepacker.rectpacker.Rectangle;
 import net.natewm.imagepacker.rectpacker.RectanglePacker;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -15,11 +14,10 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class Application implements AppListenable, ImageListener, OptionListener, ErrorListenable {
+public class Application implements AppListenable, ImageListener, OptionListener {
     private static Logger logger = Logger.getLogger(Application.class.getName());
 
     private List<AppListener> listeners = new ArrayList<>();
-    private List<ErrorListener> errorListeners = new ArrayList<>();
 
     private Options options;
     private ImageManager imageManager;
@@ -34,33 +32,17 @@ public class Application implements AppListenable, ImageListener, OptionListener
     }
 
     @Override
-    public void addAppListener(AppListener listener) {
+    public synchronized void addAppListener(AppListener listener) {
         listeners.add(listener);
     }
 
     @Override
-    public void removeAppListener(AppListener listener) {
+    public synchronized void removeAppListener(AppListener listener) {
         listeners.remove(listener);
     }
 
     @Override
     public void onLoadImages(List<File> files) {
-        ImageIO.setUseCache(false);
-
-        files.forEach(file -> {
-            Services.getExecutorService().submit(() -> {
-                try {
-                    final Image image = ImageIO.read(file);
-                    if (image == null) throw new IOException();
-                    final PackableImage packableImage = new PackableImage(image, file.getName());
-                    imageLoaded(packableImage);
-                } catch (IOException e) {
-                    // TODO: Display error alert
-                    errorLoadingImage(file);
-                    //e.printStackTrace();
-                }
-            });
-        });
     }
 
     @Override
@@ -151,15 +133,6 @@ public class Application implements AppListenable, ImageListener, OptionListener
     public void onSetOutputImage(Image outputImage) {
     }
 
-    private void imageLoaded(PackableImage packableImage) {
-        imageManager.addImage(packableImage);
-    }
-
-    private synchronized void errorLoadingImage(File file) {
-        for (int i=errorListeners.size()-1; i>=0; i--)
-            errorListeners.get(i).onErrorLoadingImage(file);
-    }
-
     private synchronized void packCompleted(Image outputImage, RectanglePacker.Results<PackableImage> results) {
         outputResults = results;
         imageManager.setOutputImage(outputImage);
@@ -181,27 +154,27 @@ public class Application implements AppListenable, ImageListener, OptionListener
         try {
             PrintWriter writer = new PrintWriter(file);
             writer.println("{");
-            writer.println("    \"image\": \"" + outputOptions.getOutputName() + "\",");
-            writer.println("    \"type\": \"map\",");
-            writer.println("    \"regions\": [");
+            writer.println("\t\"image\": \"" + outputOptions.getOutputName() + "\",");
+            writer.println("\t\"type\": \"map\",");
+            writer.println("\t\"regions\": [");
 
             for (int i=0; i<outputResults.packed.size(); i++) {
                 Rectangle<PackableImage> rectangle = outputResults.packed.get(i);
-                writer.println("        {");
-                writer.println("            \"id\": \"" + rectangle.getContent().getName() + "\",");
-                writer.println("            \"x\": " + (rectangle.getX() + outputOptions.getPadding()) + ",");
-                writer.println("            \"y\": " + (rectangle.getY() + outputOptions.getPadding()) + ",");
-                writer.println("            \"width\": " + (rectangle.getWidth() - outputOptions.getPadding() * 2) + ",");
-                writer.println("            \"height\": " + (rectangle.getHeight() - outputOptions.getPadding() * 2) + ",");
-                writer.println("            \"offsetX\": " + rectangle.getContent().getMinX() + ", ");
-                writer.println("            \"offsetY\": " + rectangle.getContent().getMinY());
+                writer.println("\t\t{");
+                writer.println("\t\t\t\"id\": \"" + rectangle.getContent().getName() + "\",");
+                writer.println("\t\t\t\"x\": " + (rectangle.getX() + outputOptions.getPadding()) + ",");
+                writer.println("\t\t\t\"y\": " + (rectangle.getY() + outputOptions.getPadding()) + ",");
+                writer.println("\t\t\t\"width\": " + (rectangle.getWidth() - outputOptions.getPadding() * 2) + ",");
+                writer.println("\t\t\t\"height\": " + (rectangle.getHeight() - outputOptions.getPadding() * 2) + ",");
+                writer.println("\t\t\t\"offsetX\": " + rectangle.getContent().getMinX() + ", ");
+                writer.println("\t\t\t\"offsetY\": " + rectangle.getContent().getMinY());
                 if (i < outputResults.packed.size()-1)
-                    writer.println("        },");
+                    writer.println("\t\t},");
                 else
-                    writer.println("        }");
+                    writer.println("\t\t}");
             }
 
-            writer.println("    ]");
+            writer.println("\t]");
             writer.println("}");
 
             writer.close();
@@ -222,6 +195,7 @@ public class Application implements AppListenable, ImageListener, OptionListener
 
     @Override
     public void onLiveUpdateChange(boolean value) {
+        doLiveUpdate();
     }
 
     @Override
@@ -237,15 +211,5 @@ public class Application implements AppListenable, ImageListener, OptionListener
     @Override
     public void onPaddingChange(int value) {
         doLiveUpdate();
-    }
-
-    @Override
-    public void addErrorListener(ErrorListener listener) {
-        errorListeners.add(listener);
-    }
-
-    @Override
-    public void removeErrorListener(ErrorListener listener) {
-        errorListeners.remove(listener);
     }
 }
