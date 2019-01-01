@@ -1,13 +1,13 @@
 package net.natewm.imagepacker.gui;
 
-import net.natewm.imagepacker.*;
+import net.natewm.imagepacker.AppListenable;
+import net.natewm.imagepacker.AppListener;
+import net.natewm.imagepacker.PackableImage;
 import net.natewm.imagepacker.rectpacker.RectanglePacker;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
-import java.io.File;
-import java.util.List;
 
 public class StatusBar extends JPanel implements AppListener {
     private JLabel label;

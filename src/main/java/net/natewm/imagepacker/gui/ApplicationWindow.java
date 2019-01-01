@@ -4,7 +4,6 @@ import net.natewm.imagepacker.*;
 import net.natewm.imagepacker.rectpacker.RectanglePacker;
 
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -38,7 +37,7 @@ public class ApplicationWindow extends JFrame implements
      * @param imageManager Manages images used by the application.
      * @param application  The application performs core functions.
      */
-    public ApplicationWindow(Options options, ImageManager imageManager, Application application) {
+    public ApplicationWindow(Options options, ImageManager imageManager, ImageLoader imageLoader, Application application) {
         this.imageManager = imageManager;
         this.application = application;
 
@@ -96,7 +95,7 @@ public class ApplicationWindow extends JFrame implements
         constraints.fill = GridBagConstraints.BOTH;
         add(statusBar, constraints);
 
-        initMenu();
+        initMenu(imageLoader);
 
         pack();
         setLocationRelativeTo(null);
@@ -105,7 +104,7 @@ public class ApplicationWindow extends JFrame implements
     /**
      * Initializes the window's menu bar.
      */
-    private void initMenu() {
+    private void initMenu(ImageLoader imageLoader) {
         final JMenuBar menuBar = new JMenuBar();
         final JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
@@ -151,7 +150,7 @@ public class ApplicationWindow extends JFrame implements
         loadImagesMenu.addActionListener(listener -> {
             int retval = fileChooser.showOpenDialog(this);
             if (retval == JFileChooser.APPROVE_OPTION) {
-                imageManager.loadImages(Arrays.asList(fileChooser.getSelectedFiles()));
+                imageLoader.loadImages(Arrays.asList(fileChooser.getSelectedFiles()));
             }
         });
 

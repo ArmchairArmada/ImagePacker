@@ -21,18 +21,13 @@ public class ImageManager implements ImageListenable {
     }
 
     @Override
-    public void addImageListener(ImageListener listener) {
+    public synchronized void addImageListener(ImageListener listener) {
         listeners.add(listener);
     }
 
     @Override
-    public void removeImageListener(ImageListener listener) {
+    public synchronized void removeImageListener(ImageListener listener) {
         listeners.remove(listener);
-    }
-
-    public synchronized void loadImages(List<File> files) {
-        for (int i=listeners.size()-1; i>=0; i--)
-            listeners.get(i).onLoadImages(files);
     }
 
     public synchronized void addImage(PackableImage image) {

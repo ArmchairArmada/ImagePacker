@@ -1,6 +1,6 @@
 package net.natewm.imagepacker;
 
 public interface ErrorListenable {
-    public void addErrorListener(ErrorListener listener);
-    public void removeErrorListener(ErrorListener listener);
+    void addErrorListener(ErrorListener listener);
+    void removeErrorListener(ErrorListener listener);
 }
