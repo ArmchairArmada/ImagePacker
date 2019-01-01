@@ -1,7 +1,6 @@
 package net.natewm.imagepacker.rectpacker;
 
-import javafx.util.Pair;
-
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,14 +57,14 @@ public class BinarySubdividePacker<T> implements RectanglePacker<T> {
         Rectangle spaceA;
         Rectangle spaceB;
         if (space.getWidth() - rect.getWidth() < space.getHeight() - rect.getHeight()) {
-            Pair<Rectangle, Rectangle> splitA = space.splitHorizontal(rect.getHeight());
-            Pair<Rectangle, Rectangle> splitB = splitA.getKey().splitVertically(rect.getWidth());
+            SimpleEntry<Rectangle, Rectangle> splitA = space.splitHorizontal(rect.getHeight());
+            SimpleEntry<Rectangle, Rectangle> splitB = splitA.getKey().splitVertically(rect.getWidth());
             spaceA = splitB.getValue();
             spaceB = splitA.getValue();
         }
         else {
-            Pair<Rectangle, Rectangle> splitA = space.splitVertically(rect.getWidth());
-            Pair<Rectangle, Rectangle> splitB = splitA.getKey().splitHorizontal(rect.getHeight());
+            SimpleEntry<Rectangle, Rectangle> splitA = space.splitVertically(rect.getWidth());
+            SimpleEntry<Rectangle, Rectangle> splitB = splitA.getKey().splitHorizontal(rect.getHeight());
             spaceA = splitB.getValue();
             spaceB = splitA.getValue();
         }
