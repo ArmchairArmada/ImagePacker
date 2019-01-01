@@ -1,6 +1,6 @@
 package net.natewm.imagepacker.rectpacker;
 
-import javafx.util.Pair;
+import java.util.AbstractMap.SimpleEntry;
 
 public class Rectangle<T> {
     private int x;
@@ -97,15 +97,15 @@ public class Rectangle<T> {
         return width * height;
     }
 
-    public Pair<Rectangle, Rectangle> splitHorizontal(int splitHeight) {
+    public SimpleEntry<Rectangle, Rectangle> splitHorizontal(int splitHeight) {
         Rectangle rectA = new Rectangle(x, y, width, splitHeight);
         Rectangle rectB = new Rectangle(x, y + splitHeight, width, height - splitHeight);
-        return new Pair<>(rectA, rectB);
+        return new SimpleEntry<>(rectA, rectB);
     }
 
-    public Pair<Rectangle, Rectangle> splitVertically(int splitWidth) {
+    public SimpleEntry<Rectangle, Rectangle> splitVertically(int splitWidth) {
         Rectangle rectA = new Rectangle(x, y, splitWidth, height);
         Rectangle rectB = new Rectangle(x + splitWidth, y, width - splitWidth, height);
-        return new Pair<>(rectA, rectB);
+        return new SimpleEntry<>(rectA, rectB);
     }
 }
