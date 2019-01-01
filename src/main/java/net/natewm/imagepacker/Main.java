@@ -27,14 +27,16 @@ public class Main {
             }
 
             Services.setExecutorService(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()));
+            ErrorHandler errorHandler = new ErrorHandler();
             Options options = new Options();
             ImageManager imageManager = new ImageManager();
+            ImageLoader imageLoader = new ImageLoader(imageManager, errorHandler);
             Application app = new Application(options, imageManager);
-            ApplicationWindow win = new ApplicationWindow(options, imageManager, app);
+            ApplicationWindow win = new ApplicationWindow(options, imageManager, imageLoader, app);
 
             imageManager.addImageListener(app);
             app.addAppListener(win);
-            app.addErrorListener(win);
+            errorHandler.addErrorListener(win);
             options.addOptionListener(app);
 
             win.setVisible(true);

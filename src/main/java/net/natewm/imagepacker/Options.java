@@ -98,12 +98,12 @@ public class Options implements OptionListenable {
     }
 
     @Override
-    public void addOptionListener(OptionListener listener) {
+    public synchronized void addOptionListener(OptionListener listener) {
         listeners.add(listener);
     }
 
     @Override
-    public void removeOptionListener(OptionListener listener) {
+    public synchronized void removeOptionListener(OptionListener listener) {
         listeners.remove(listener);
     }
 }

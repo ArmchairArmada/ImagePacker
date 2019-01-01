@@ -9,10 +9,16 @@ import java.awt.*;
 import java.io.File;
 import java.util.List;
 
+/**
+ * Displays a preview of the packed images.
+ */
 public class ImagePreview extends JPanel implements ImageListener {
     private JPanel previewPanel;
     private JLabel imageLabel;
 
+    /**
+     * Constructs image preview panel.
+     */
     public ImagePreview() {
         setLayout(new BorderLayout());
 
@@ -27,12 +33,16 @@ public class ImagePreview extends JPanel implements ImageListener {
         previewPanel.setLayout(new GridBagLayout());
         imageLabel = new JLabel();
         imageLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        //imageLabel.setPreferredSize(new Dimension(512, 512));
         previewPanel.add(imageLabel);
 
         add(scrollPane, BorderLayout.CENTER);
     }
 
+    /**
+     * Sets the image to be displayed in the preview panel.
+     *
+     * @param image Image to be displayed.
+     */
     public void setImage(Image image) {
         imageLabel.setIcon(new ImageIcon(image));
         previewPanel.setPreferredSize(new Dimension(image.getWidth(null), image.getHeight(null)));
@@ -58,6 +68,11 @@ public class ImagePreview extends JPanel implements ImageListener {
     public void onPackImages(List<PackableImage> images) {
     }
 
+    /**
+     * Called when the output image is set in the Image Manager.
+     *
+     * @param outputImage Image to use as the output image.
+     */
     @Override
     public void onSetOutputImage(Image outputImage) {
         SwingUtilities.invokeLater(() -> {
